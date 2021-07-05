@@ -41,7 +41,7 @@ const plugins = () => {
     }),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: `./css/${filename('css')}`
+      filename: `./css/${filename('min.css')}`
     }),
     new CopyWebpackPlugin({
       patterns: [
@@ -90,7 +90,7 @@ const plugins = () => {
 module.exports = {
   context: path.resolve(__dirname, 'src'),
   mode: 'development',
-  entry: './js/main.js',
+  entry: ['@babel/polyfill', './main.js'],
   output: {
     filename: `./js/${filename('js')}`,
     path: path.resolve(__dirname, 'app'),
@@ -102,7 +102,10 @@ module.exports = {
     open: true,
     compress: true,
     hot: true,
-    port: 3000,
+    port: 7777,
+  },
+  resolve: {
+    extensions: ['.js', '.jsx', '.json']
   },
   optimization: optimization(),
   plugins: plugins(),
@@ -110,9 +113,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.html$/,
-        loader: 'html-loader',
-      },
+       test: /\.html$/i,
+       loader: 'html-loader',
+     },
       {
         test: /\.css$/i,
         use: [
@@ -140,10 +143,20 @@ module.exports = {
           'sass-loader'
         ],
       },
+      // {
+      //   test: /\.js$/,
+      //   exclude: /node_modules/,
+      //   use: ['babel-loader'],
+      // },
       {
-        test: /\.js$/,
+        test: /\.jsx$/,
         exclude: /node_modules/,
-        use: ['babel-loader'],
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ['@babel/preset-react', '@babel/preset-env']
+          }
+        }
       },
       {
         test: /\.(?:|gif|png|jpg|jpeg|svg)$/,
